@@ -10,3 +10,8 @@ zig run zig-download.zig
 ```
 
 Then put the following on your PATH: `~/zig-downloads/active`
+
+#### Python version???
+
+There seems to be a bug somewhere in the Zig https -> xz -> untar pipeline that causes the program to hang at 100% CPU.
+I wrote a Python version for now.
