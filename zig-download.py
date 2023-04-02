@@ -11,16 +11,33 @@ downloads_dir = os.path.expanduser("~/zig-downloads")
 def main():
     import argparse
     parser = argparse.ArgumentParser()
+    parser.add_argument("version", nargs="?", help=
+        "'master' or 'stable' or '0.10.1' etc. "
+        "Default is 'master'. 'stable' is the greatest available semver version.")
     args = parser.parse_args()
 
     with urllib.request.urlopen(metadata_url) as r:
         metadata = json.load(r)
 
-    version = metadata["master"]["version"]
+    if args.version in (None, "master"):
+        release_obj = metadata["master"]
+        version = release_obj["version"]
+    elif args.version == "stable":
+        version = sorted([
+            key for key in metadata.keys()
+            if key != "master"
+        ], key=lambda key: tuple(int(n) for n in key.split(".")))[-1]
+        release_obj = metadata[version]
+    else:
+        version = args.version
+        try:
+            release_obj = metadata[version]
+        except KeyError:
+            sys.exit("ERROR: version not found: " + args.version)
     dest_dir = os.path.join(downloads_dir, version)
     tmp_path = os.path.join(downloads_dir, ".tmp")
     if not os.path.isdir(dest_dir):
-        download_url = metadata["master"]["x86_64-linux"]["tarball"]
+        download_url = release_obj["x86_64-linux"]["tarball"]
         print("downloading: " + download_url)
         if os.path.exists(tmp_path):
             shutil.rmtree(tmp_path)
