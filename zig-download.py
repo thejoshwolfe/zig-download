@@ -51,7 +51,11 @@ def main():
         os.rmdir(tmp_path)
 
     active_symlink = os.path.join(downloads_dir, "active")
-    if os.readlink(active_symlink) != version:
+    try:
+        active_version = os.readlink(active_symlink)
+    except FileNotFoundError:
+        active_version = None
+    if active_version != version:
         print("activating version: " + version)
         os.symlink(version, tmp_path)
         os.rename(tmp_path, active_symlink)
