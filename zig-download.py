@@ -190,10 +190,10 @@ def do_activate(version):
             download_url = release_obj["x86_64-linux"]["tarball"]
     dest_dir = os.path.join(downloads_dir, version)
     tmp_path = os.path.join(downloads_dir, ".tmp")
+    if os.path.exists(tmp_path):
+        shutil.rmtree(tmp_path)
     if not os.path.isdir(dest_dir):
         print("downloading: " + download_url)
-        if os.path.exists(tmp_path):
-            shutil.rmtree(tmp_path)
         os.makedirs(tmp_path)
         with urllib.request.urlopen(download_url) as r:
             # Can't pipe this straight to tar, because that makes the bytes different in some mysterious way.
